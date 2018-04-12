@@ -22,7 +22,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			if(buttons & IN_ATTACK)
 			{
 				TF2_RemoveWeaponSlot(client, 1);
-				SetEntPropEnt(client, Prop_Send, "m_hSwitchTo", GetEntPropEnt(client, Prop_Send, "m_hLastWeapon"));
+				SwitchToOtherWeapon(client, GetEntPropEnt(client, Prop_Data, "m_hLastWeapon"));
 				CreateSapperProp(client, target);
 				TF2_StunPlayer(target, 4.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
 				TF2_AddCondition(target, TFCond_Sapped, 4.0, client);
@@ -103,6 +103,63 @@ bool IsSapperWeapon(int weapon)
 
     return false;
 }
+
+stock void SwitchToOtherWeapon(int client, int weapon = -1)
+{
+	if(weapon == -1 || IsValidEntity(weapon))
+    	weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+
+    int ammo = GetAmmo(client, weapon);
+    int clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
+
+    if (!(ammo == 0 && clip <= 0))
+    {
+        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+    }
+    else
+    {
+        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Melee));
+    }
+}
+
+stock int GetAmmo(int client, int weapon)
+{
+    if (IsValidEntity(weapon))
+    {
+        int iOffset = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType", 1); // * 4;
+
+        if (iOffset < 0)
+        {
+            return -1;
+        }
+
+        return GetEntProp(client, Prop_Send, "m_iAmmo", _, iOffset);
+    }
+
+    return -1;
+}
+/*
+stock int GetSlotAmmo(int client, int slot)
+{
+    if (!IsValidClient(client)) return -1;
+
+    int weapon = GetPlayerWeaponSlot(client, slot);
+
+    if (IsValidEntity(weapon))
+    {
+        int iOffset = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType", 1); // * 4;
+
+        if (iOffset < 0)
+        {
+            return -1;
+        }
+
+        return GetEntProp(client, Prop_Send, "m_iAmmo", _, iOffset);
+    }
+
+    return -1;
+}
+*/
 
 stock bool IsValidClient(int client)
 {
