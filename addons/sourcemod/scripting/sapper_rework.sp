@@ -19,7 +19,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		if(IsValidEntity(currentWeapon) && IsSapperWeapon(currentWeapon)
 		&& IsValidClient((target = GetClientInSapperRange(client))))
 		{
-			if(buttons & IN_ATTACK)
+			if(buttons & IN_ATTACK && GetEntProp(client, Prop_Send, "m_bFeignDeathReady") <= 0)
 			{
 				TF2_RemoveWeaponSlot(client, 1);
 				SwitchToOtherWeapon(client, GetEntPropEnt(client, Prop_Data, "m_hLastWeapon"));
