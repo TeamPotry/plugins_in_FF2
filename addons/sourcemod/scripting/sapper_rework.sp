@@ -12,13 +12,13 @@ public Plugin myinfo=
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &newWeapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-    if(IsValidClient(client) && IsPlayerAlive(client))
-    {
-        int target = -1;
+	if(IsValidClient(client) && IsPlayerAlive(client))
+	{
+		int target = -1;
 		int currentWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-        if(IsValidEntity(currentWeapon) && IsSapperWeapon(currentWeapon)
-        && IsValidClient((target = GetClientInSapperRange(client))))
-        {
+		if(IsValidEntity(currentWeapon) && IsSapperWeapon(currentWeapon)
+		&& IsValidClient((target = GetClientInSapperRange(client))))
+		{
 			if(buttons & IN_ATTACK)
 			{
 				TF2_RemoveWeaponSlot(client, 1);
@@ -27,20 +27,20 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 				TF2_StunPlayer(target, 4.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
 				TF2_AddCondition(target, TFCond_Sapped, 4.0, client);
 			}
-        }
-    }
+		}
+	}
 
 	return Plugin_Continue;
 }
 
 int GetClientInSapperRange(int client)
 {
-    float clientPos[3], clientAngles[3];
+	float clientPos[3], clientAngles[3];
 	float fwd[3], endPos[3];
 	int endEntity = -1;
 
-    GetClientEyePosition(client, clientPos);
-    GetClientEyeAngles(client, clientAngles);
+	GetClientEyePosition(client, clientPos);
+	GetClientEyeAngles(client, clientAngles);
 
 	GetAngleVectors(clientAngles, fwd, NULL_VECTOR, NULL_VECTOR);
 	ScaleVector(fwd, 128.0);
@@ -93,50 +93,50 @@ public bool TracePlayer(int entity, int contentsMask, any data)
 
 bool IsSapperWeapon(int weapon)
 {
-    char classname[32];
+	char classname[32];
 	GetEntityClassname(weapon, classname, sizeof(classname));
 
-    if((StrEqual(classname, "tf_weapon_builder")
-    && (GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") == 735 || GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") == 736))
-    || (StrContains(classname, "tf_weapon_sapper") != -1)
-    )   return true;
+	if((StrEqual(classname, "tf_weapon_builder")
+	&& (GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") == 735 || GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") == 736))
+	|| (StrContains(classname, "tf_weapon_sapper") != -1)
+	)   return true;
 
-    return false;
+	return false;
 }
 
 stock void SwitchToOtherWeapon(int client, int weapon = -1)
 {
 	if(weapon == -1 || IsValidEntity(weapon))
-    	weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+		weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
 
-    int ammo = GetAmmo(client, weapon);
-    int clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
+	int ammo = GetAmmo(client, weapon);
+	int clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
 
-    if (!(ammo == 0 && clip <= 0))
-    {
-        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-    }
-    else
-    {
-        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Melee));
-    }
+	if (!(ammo == 0 && clip <= 0))
+	{
+	    SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+	}
+	else
+	{
+	    SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Melee));
+	}
 }
 
 stock int GetAmmo(int client, int weapon)
 {
-    if (IsValidEntity(weapon))
-    {
-        int iOffset = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType", 1); // * 4;
+	if (IsValidEntity(weapon))
+	{
+	    int iOffset = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType", 1); // * 4;
 
-        if (iOffset < 0)
-        {
-            return -1;
-        }
+	    if (iOffset < 0)
+	    {
+	        return -1;
+	    }
 
-        return GetEntProp(client, Prop_Send, "m_iAmmo", _, iOffset);
-    }
+	    return GetEntProp(client, Prop_Send, "m_iAmmo", _, iOffset);
+	}
 
-    return -1;
+	return -1;
 }
 /*
 stock int GetSlotAmmo(int client, int slot)
