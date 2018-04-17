@@ -23,7 +23,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			if(buttons & IN_ATTACK && !cloaked)
 			{
 				TF2_RemoveWeaponSlot(client, 1);
-				SwitchToOtherWeapon(client, GetEntPropEnt(client, Prop_Data, "m_hLastWeapon"));
+				SwitchToOtherWeapon(client);
 				CreateSapperProp(client, target);
 				TF2_StunPlayer(target, 4.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
 				TF2_AddCondition(target, TFCond_Sapped, 4.0, client);
@@ -105,11 +105,9 @@ bool IsSapperWeapon(int weapon)
 	return false;
 }
 
-stock void SwitchToOtherWeapon(int client, int weapon = -1)
+stock void SwitchToOtherWeapon(int client)
 {
-	if(weapon == -1 || IsValidEntity(weapon))
-		weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
-
+	int	weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
 	int ammo = GetAmmo(client, weapon);
 	int clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
 
