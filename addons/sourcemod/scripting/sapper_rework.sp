@@ -154,6 +154,31 @@ public Action SapperTimeEnd(Handle timer, any data)
 	this.SetValue(Sapper_TimerHandle, null);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+CustomCTFSapper c_hClientSapper[MAXPLAYERS+1] = null;
+
+public void OnMapStart()
+{
+	HookEvent("teamplay_round_start", OnRoundStart);
+}
+
+public Action OnRoundStart(Event event, const char[] name, bool dontBroadcast)
+{
+	for(int client = 0; client <= MaxClients; client++)
+	{
+		if(c_hClientSapper[client] != null)
+			delete c_hClientSapper[client];
+	}
+
+	return Plugin_Continue;
+}
+
+public void OnClientDisconnect(int client)
+{
+	if(c_hClientSapper[client] != null)
+		delete c_hClientSapper[client];
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &newWeapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -171,7 +196,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			{
 				TF2_RemoveWeaponSlot(client, 1);
 				SwitchToOtherWeapon(client);
-				CreateSapperProp(client, target);
+				c_hClientSapper[target] = CreateSapper(client, target);
 				TF2_StunPlayer(target, 4.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
 				TF2_AddCondition(target, TFCond_Sapped, 4.0, client);
 			}
@@ -207,7 +232,24 @@ int GetClientInSapperRange(int client)
 	return endEntity;
 }
 
-int CreateSapperProp(int bulider, int target) // Yeah. Only for client. (for now)
+CustomCTFSapper CreateSapper(int client, int target, float lifeTime = 4.0, int flags = 0)
+{
+	CustomCTFSapper sapper = new CustomCTFSapper(client, target);
+	int validCheckInteger = -1;
+
+	sapper.HP = 100;
+	// sapper.PropIndex = IsValidEntity((validCheckInteger = CreateSapperProp(client, target)));
+	// sapper.Type ?
+	sapper.Flags = flags;
+	sapper.LifeTime = 4.0;
+
+	return sapper;
+}
+
+// int CreateSapperProp(int bulider, int target) // TODO: Only prop.
+
+/*
+int CreateSapperProp(int bulider, int target) // TODO: 3.0
 {
 	int sapperProp = CreateEntityByName("obj_attachment_sapper");
 	if(IsValidEntity(sapperProp))
