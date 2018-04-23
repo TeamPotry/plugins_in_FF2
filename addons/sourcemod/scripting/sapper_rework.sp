@@ -12,13 +12,14 @@ public Plugin myinfo=
 
 enum SapperValueType
 {
-	Sapper_HP,
+	Sapper_HP, // NOTE: 새퍼를 회복 하는 기능이 언젠가 나올까?
 	Sapper_Owner,
 	Sapper_Target,
 	Sapper_PropIndex,
 	Sapper_Type, // TODO: 절차주의 새퍼 기능 구현
 	Sapper_Flags,
 	Sapper_LifeTime
+	Sapper_TimerHandle // This is Private. DO NOT TOUCH.
 
 	SapperValue_Last // NOTE: Keep this at this position.
 };
@@ -121,19 +122,27 @@ methodmap CustomCTFSapper < ArrayList {
 
 		public set(const int flags)
 		{
-			this.SetValue(Sapper_Flags, type);
+			this.SetValue(Sapper_Flags, flags);
 		}
 	}
 
 	property float LifeTime {
 		public get()
 		{
-			return this.GetValue(Sapper_LifeTime);
+			return this.GetValue(Sapper_LifeTime) - GetGameTime();
 		}
 
 		public set(const float lifeTime)
 		{
-			this.SetValue(Sapper_LifeTime, ownerIndex);
+			if(this.GetValue(Sapper_TimerHandle) != null)
+				KillTimer(this.GetValue(Sapper_TimerHandle));
+
+			if(lifeTime > 0.0)
+			{
+				this.SetValue(Sapper_LifeTime, GetGameTime() + lifeTime);
+
+				this.SetValue(Sapper_TimerHandle, CreateTimer(lifeTime, SapperTimeEnd, this, TIMER_FLAG_NO_MAPCHANGE));
+			}
 		}
 	}
 }
