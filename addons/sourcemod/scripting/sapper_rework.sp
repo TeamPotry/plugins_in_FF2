@@ -67,10 +67,12 @@ methodmap CustomCTFSapper < ArrayList {
 			return this.GetValue(Sapper_Owner);
 		}
 
+		/*
 		public set(const int ownerIndex)
 		{
 			this.SetValue(Sapper_Owner, ownerIndex);
 		}
+		*/
 	}
 
 	property int Target {
@@ -79,10 +81,12 @@ methodmap CustomCTFSapper < ArrayList {
 			return this.GetValue(Sapper_Target);
 		}
 
+		/*
 		public set(const int targetIndex)
 		{
 			this.SetValue(Sapper_Target, ownerIndex);
 		}
+		*/
 	}
 
 	property int PropIndex {
@@ -208,6 +212,7 @@ int CreateSapperProp(int bulider, int target) // Yeah. Only for client. (for now
 
 	return -1;
 }
+*/
 
 public bool TracePlayer(int entity, int contentsMask, any data)
 {
