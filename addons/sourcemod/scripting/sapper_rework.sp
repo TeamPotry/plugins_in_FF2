@@ -18,8 +18,8 @@ enum SapperValueType
 	Sapper_PropIndex,
 	Sapper_Type, // TODO: 절차주의 새퍼 기능 구현
 	Sapper_Flags,
-	Sapper_LifeTime
-	Sapper_TimerHandle // This is Private. DO NOT TOUCH.
+	Sapper_LifeTime,
+	Sapper_TimerHandle, // This is Private. DO NOT TOUCH.
 
 	SapperValue_Last // NOTE: Keep this at this position.
 };
@@ -30,11 +30,11 @@ methodmap CustomCTFSapper < ArrayList {
 
 		for(int loop = 0; loop < view_as<int>(SapperValue_Last); loop++)
 		{
-			array.Set(loop, null);
+			array.Set(loop, 0);
 		}
 
-		array.SetValue(Sapper_Owner, bulider);
-		array.SetValue(Sapper_Target, target);
+		array.Set(view_as<int>(Sapper_Owner), bulider);
+		array.Set(view_as<int>(Sapper_Target), target);
 
 		return array;
 	}
@@ -134,7 +134,7 @@ methodmap CustomCTFSapper < ArrayList {
 
 		public set(const float lifeTime)
 		{
-			if(this.GetValue(Sapper_TimerHandle) != null)
+			if(this.GetValue(Sapper_TimerHandle) != 0)
 				KillTimer(this.GetValue(Sapper_TimerHandle));
 
 			if(lifeTime > 0.0)
@@ -151,7 +151,7 @@ public Action SapperTimeEnd(Handle timer, any data)
 {
 	CustomCTFSapper sapper = view_as<CustomCTFSapper>(data);
 
-	this.SetValue(Sapper_TimerHandle, null);
+	sapper.SetValue(Sapper_TimerHandle, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -235,13 +235,13 @@ int GetClientInSapperRange(int client)
 CustomCTFSapper CreateSapper(int client, int target, float lifeTime = 4.0, int flags = 0)
 {
 	CustomCTFSapper sapper = new CustomCTFSapper(client, target);
-	int validCheckInteger = -1;
+	// int validCheckInteger = -1;
 
 	sapper.HP = 100;
 	// sapper.PropIndex = IsValidEntity((validCheckInteger = CreateSapperProp(client, target)));
 	// sapper.Type ?
 	sapper.Flags = flags;
-	sapper.LifeTime = 4.0;
+	sapper.LifeTime = lifeTime;
 
 	return sapper;
 }
