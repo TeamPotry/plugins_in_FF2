@@ -10,6 +10,100 @@ public Plugin myinfo=
 	version="0.0",
 };
 
+enum SapperValueType
+{
+	Sapper_HP,
+	Sapper_Owner,
+	Sapper_PropIndex,
+	Sapper_Type, // TODO: 절차주의 새퍼 기능 구현
+	Sapper_Flags,
+
+	SapperValue_Last // NOTE: Keep this at this position.
+};
+
+methodmap CustomCTFSapper < ArrayList {
+	public CustomCTFSapper() {
+		ArrayList array = new ArrayList(4, view_as<int>(SapperValue_Last));
+
+		for(int loop = 0; loop < view_as<int>(SapperValue_Last); loop++)
+		{
+			array.Set(loop, null);
+		}
+		return view_as<CustomCTFSapper>(array);
+	}
+
+	public any GetValue(SapperValueType valueType)
+	{
+		return this.Get(view_as<int>(valueType));
+	}
+
+	public void SetValue(SapperValueType valueType, any value)
+	{
+		this.Set(view_as<int>(valueType), value);
+	}
+
+
+	property int HP {
+		public get()
+		{
+			return this.GetValue(Sapper_HP);
+		}
+
+		public set(const int healthPoint)
+		{
+			this.SetValue(Sapper_HP, healthPoint);
+		}
+	}
+
+	property int Owner {
+		public get()
+		{
+			return this.GetValue(Sapper_Owner);
+		}
+
+		public set(const int ownerIndex)
+		{
+			this.SetValue(Sapper_Owner, ownerIndex);
+		}
+	}
+
+	property int PropIndex {
+		public get()
+		{
+			return this.GetValue(Sapper_PropIndex);
+		}
+
+		public set(const int propIndex)
+		{
+			this.SetValue(Sapper_PropIndex, propIndex);
+		}
+	}
+
+	property int Type {
+		public get()
+		{
+			return this.GetValue(Sapper_Type);
+		}
+
+		public set(const int type)
+		{
+			this.SetValue(Sapper_Type, type);
+		}
+	}
+
+	property int Flags {
+		public get()
+		{
+			return this.GetValue(Sapper_Flags);
+		}
+
+		public set(const int flags)
+		{
+			this.SetValue(Sapper_Flags, type);
+		}
+	}
+}
+
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &newWeapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	if(IsValidClient(client) && IsPlayerAlive(client))
