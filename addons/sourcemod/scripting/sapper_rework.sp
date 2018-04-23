@@ -24,14 +24,18 @@ enum SapperValueType
 };
 
 methodmap CustomCTFSapper < ArrayList {
-	public CustomCTFSapper() {
-		ArrayList array = new ArrayList(4, view_as<int>(SapperValue_Last));
+	public CustomCTFSapper(int bulider, int target) {
+		CustomCTFSapper array = view_as<CustomCTFSapper>(new ArrayList(4, view_as<int>(SapperValue_Last)));
 
 		for(int loop = 0; loop < view_as<int>(SapperValue_Last); loop++)
 		{
 			array.Set(loop, null);
 		}
-		return view_as<CustomCTFSapper>(array);
+
+		array.SetValue(Sapper_Owner, bulider);
+		array.SetValue(Sapper_Target, target);
+
+		return array;
 	}
 
 	public any GetValue(SapperValueType valueType)
