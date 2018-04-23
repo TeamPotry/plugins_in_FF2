@@ -14,9 +14,11 @@ enum SapperValueType
 {
 	Sapper_HP,
 	Sapper_Owner,
+	Sapper_Target,
 	Sapper_PropIndex,
 	Sapper_Type, // TODO: 절차주의 새퍼 기능 구현
 	Sapper_Flags,
+	Sapper_LifeTime
 
 	SapperValue_Last // NOTE: Keep this at this position.
 };
@@ -67,6 +69,18 @@ methodmap CustomCTFSapper < ArrayList {
 		}
 	}
 
+	property int Target {
+		public get()
+		{
+			return this.GetValue(Sapper_Target);
+		}
+
+		public set(const int targetIndex)
+		{
+			this.SetValue(Sapper_Target, ownerIndex);
+		}
+	}
+
 	property int PropIndex {
 		public get()
 		{
@@ -102,6 +116,20 @@ methodmap CustomCTFSapper < ArrayList {
 			this.SetValue(Sapper_Flags, type);
 		}
 	}
+
+	property float LifeTime {
+		public get()
+		{
+			return this.GetValue(Sapper_LifeTime);
+		}
+
+		public set(const float lifeTime)
+		{
+			this.SetValue(Sapper_LifeTime, ownerIndex);
+		}
+	}
+}
+
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &newWeapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
