@@ -147,6 +147,13 @@ methodmap CustomCTFSapper < ArrayList {
 	}
 }
 
+public Action SapperTimeEnd(Handle timer, any data)
+{
+	CustomCTFSapper sapper = view_as<CustomCTFSapper>(data);
+
+	this.SetValue(Sapper_TimerHandle, null);
+}
+
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &newWeapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
