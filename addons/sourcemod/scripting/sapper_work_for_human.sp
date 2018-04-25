@@ -2,184 +2,54 @@
 #include <tf2>
 #include <tf2_stocks>
 
+#include <sappper_work_for_human>
+
 public Plugin myinfo=
 {
-	name="Sapper's Special ability",
+	name="Sapper work for human.",
 	author="Nopied",
 	description="",
 	version="0.0",
 };
-
-enum SapperValueType
-{
-	Sapper_HP, // NOTE: 새퍼를 회복 하는 기능이 언젠가 나올까?
-	Sapper_Owner,
-	Sapper_Target,
-	Sapper_PropIndex,
-	Sapper_Type, // TODO: 절차주의 새퍼 기능 구현
-	Sapper_Flags,
-	Sapper_LifeTime,
-	Sapper_TimerHandle, // This is Private. DO NOT TOUCH.
-
-	SapperValue_Last // NOTE: Keep this at this position.
-};
-
-methodmap CustomCTFSapper < ArrayList {
-	public CustomCTFSapper(int bulider, int target) {
-		CustomCTFSapper array = view_as<CustomCTFSapper>(new ArrayList(4, view_as<int>(SapperValue_Last)));
-
-		for(int loop = 0; loop < view_as<int>(SapperValue_Last); loop++)
-		{
-			array.Set(loop, 0);
-		}
-
-		array.Set(view_as<int>(Sapper_Owner), bulider);
-		array.Set(view_as<int>(Sapper_Target), target);
-
-		return array;
-	}
-
-	public any GetValue(SapperValueType valueType)
-	{
-		return this.Get(view_as<int>(valueType));
-	}
-
-	public void SetValue(SapperValueType valueType, any value)
-	{
-		this.Set(view_as<int>(valueType), value);
-	}
-
-
-	property int HP {
-		public get()
-		{
-			return this.GetValue(Sapper_HP);
-		}
-
-		public set(const int healthPoint)
-		{
-			this.SetValue(Sapper_HP, healthPoint);
-		}
-	}
-
-	property int Owner {
-		public get()
-		{
-			return this.GetValue(Sapper_Owner);
-		}
-
-		/*
-		public set(const int ownerIndex)
-		{
-			this.SetValue(Sapper_Owner, ownerIndex);
-		}
-		*/
-	}
-
-	property int Target {
-		public get()
-		{
-			return this.GetValue(Sapper_Target);
-		}
-
-		/*
-		public set(const int targetIndex)
-		{
-			this.SetValue(Sapper_Target, ownerIndex);
-		}
-		*/
-	}
-
-	property int PropIndex {
-		public get()
-		{
-			return this.GetValue(Sapper_PropIndex);
-		}
-
-		public set(const int propIndex)
-		{
-			this.SetValue(Sapper_PropIndex, propIndex);
-		}
-	}
-
-	property int Type {
-		public get()
-		{
-			return this.GetValue(Sapper_Type);
-		}
-
-		public set(const int type)
-		{
-			this.SetValue(Sapper_Type, type);
-		}
-	}
-
-	property int Flags {
-		public get()
-		{
-			return this.GetValue(Sapper_Flags);
-		}
-
-		public set(const int flags)
-		{
-			this.SetValue(Sapper_Flags, flags);
-		}
-	}
-
-	property float LifeTime {
-		public get()
-		{
-			return this.GetValue(Sapper_LifeTime) - GetGameTime();
-		}
-
-		public set(const float lifeTime)
-		{
-			if(this.GetValue(Sapper_TimerHandle) != 0)
-				KillTimer(this.GetValue(Sapper_TimerHandle));
-
-			if(lifeTime > 0.0)
-			{
-				this.SetValue(Sapper_LifeTime, GetGameTime() + lifeTime);
-
-				this.SetValue(Sapper_TimerHandle, CreateTimer(lifeTime, SapperTimeEnd, this, TIMER_FLAG_NO_MAPCHANGE));
-			}
-		}
-	}
-}
-
-public Action SapperTimeEnd(Handle timer, any data)
-{
-	CustomCTFSapper sapper = view_as<CustomCTFSapper>(data);
-
-	sapper.SetValue(Sapper_TimerHandle, 0);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 
 CustomCTFSapper c_hClientSapper[MAXPLAYERS+1] = null;
 
 public void OnMapStart()
 {
 	HookEvent("teamplay_round_start", OnRoundStart);
+	HookEvent("player_death", OnPlayerDeath);
 }
+
+//////
+//////
 
 public Action OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
 	for(int client = 0; client <= MaxClients; client++)
 	{
 		if(c_hClientSapper[client] != null)
-			delete c_hClientSapper[client];
+			c_hClientSapper[client] = c_hClientSapper[client].KillSapper();
 	}
 
 	return Plugin_Continue;
 }
 
+public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+
+	if(c_hClientSapper[client] != null && !(event.GetInt("death_flags") & TF_DEATHFLAG_DEADRINGER))
+		c_hClientSapper[client] = c_hClientSapper[client].KillSapper();
+}
+
 public void OnClientDisconnect(int client)
 {
 	if(c_hClientSapper[client] != null)
-		delete c_hClientSapper[client];
+		c_hClientSapper[client] = c_hClientSapper[client].KillSapper();
 }
+
+//////
+//////
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &newWeapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
@@ -244,6 +114,14 @@ CustomCTFSapper CreateSapper(int client, int target, float lifeTime = 4.0, int f
 	sapper.LifeTime = lifeTime;
 
 	return sapper;
+}
+
+void OnSapperEnd(CustomCTFSapper sapper)
+{
+	int client = sapper.GetValue(Sapper_Target);
+	c_hClientSapper[client] = c_hClientSapper[client].KillSapper();
+
+	// PrintToChatAll("성공적으로 새퍼를 제거하였음.");
 }
 
 // int CreateSapperProp(int bulider, int target) // TODO: Only prop.
