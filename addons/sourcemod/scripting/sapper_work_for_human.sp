@@ -126,9 +126,7 @@ public Action SapperDamageCheck(int victim, int &attacker, int &inflictor, float
 {
 	if(IsValidClient(attacker) && IsValidEntity(weapon))
 	{
-		if(c_hClientSapper[victim].Flags & SAPPER_FLAG_INVULNERABLE) return Plugin_Continue;
-
-		if(GetClientTeam(victim) == GetClientTeam(attacker))
+		if(GetClientTeam(victim) == GetClientTeam(attacker) && !(c_hClientSapper[victim].Flags & SAPPER_FLAG_INVULNERABLE))
 		{
 			Address address = TF2Attrib_GetByName(weapon, "damage applies to sappers");
 			if(address != Address_Null && TF2Attrib_GetValue(address) > 0.0)
@@ -139,6 +137,11 @@ public Action SapperDamageCheck(int victim, int &attacker, int &inflictor, float
 					c_hClientSapper[victim].KillSapper();
 				}
 			}
+		}
+		else if(GetClientTeam(victim) != GetClientTeam(attacker))
+		{
+			damage *= 0.7;
+			return Plugin_Changed;
 		}
 	}
 
