@@ -1,6 +1,8 @@
 #include <sourcemod>
 #include <tf2>
 #include <tf2_stocks>
+#include <sdkhooks>
+#include <tf2attributes>
 
 #include <sappper_work_for_human>
 
@@ -113,7 +115,30 @@ CustomCTFSapper CreateSapper(int client, int target, float lifeTime = 4.0, int f
 	sapper.Flags = flags;
 	sapper.LifeTime = lifeTime;
 
+	SDKHook(target, SDKHook_OnTakeDamage, SapperDamageCheck);
+
 	return sapper;
+}
+
+public Action SapperDamageCheck(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+{
+	if(IsValidClient(attacker) && IsValidEntity(weapon))
+	{
+		if(GetClientTeam(victim) == GetClientTeam(attacker))
+		{
+			Address address = TF2Attrib_GetByName(weapon, "damage applies to sappers");
+			if(address != Address_Null && TF2Attrib_GetValue(address) > 0.0)
+			{
+				c_hClientSapper[victim].HP = c_hClientSapper[victim].HP - RoundFloat(damage);
+				if(c_hClientSapper[victim].HP <= 0)
+				{
+					c_hClientSapper[victim].KillSapper();
+				}
+			}
+		}
+	}
+
+	return Plugin_Continue;
 }
 
 void OnSapperEnd(CustomCTFSapper sapper)
