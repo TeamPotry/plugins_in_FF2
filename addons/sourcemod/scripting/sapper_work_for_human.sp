@@ -16,6 +16,8 @@ public Plugin myinfo=
 
 CustomCTFSapper c_hClientSapper[MAXPLAYERS+1] = null;
 
+#define SAPPER_FLAG_INVULNERABLE (1<<0)
+
 public void OnMapStart()
 {
 	HookEvent("teamplay_round_start", OnRoundStart);
@@ -124,6 +126,8 @@ public Action SapperDamageCheck(int victim, int &attacker, int &inflictor, float
 {
 	if(IsValidClient(attacker) && IsValidEntity(weapon))
 	{
+		if(c_hClientSapper[victim].Flags & SAPPER_FLAG_INVULNERABLE) return Plugin_Continue;
+
 		if(GetClientTeam(victim) == GetClientTeam(attacker))
 		{
 			Address address = TF2Attrib_GetByName(weapon, "damage applies to sappers");
