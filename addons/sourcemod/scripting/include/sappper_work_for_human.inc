@@ -33,8 +33,6 @@ methodmap CustomCTFSapper < ArrayList {
 		return array;
 	}
 
-    // NOTE: 소
-
 	public any GetValue(SapperValueType valueType)
 	{
 		return this.Get(view_as<int>(valueType));
@@ -159,5 +157,5 @@ public Action SapperTimeEnd(Handle timer, any data)
 
 	sapper.SetValue(Sapper_TimerHandle, 0);
 
-    OnSapperEnd(sapper);
+	OnSapperEnd(sapper);
 }
