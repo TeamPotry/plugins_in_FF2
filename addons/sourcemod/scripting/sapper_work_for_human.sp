@@ -79,11 +79,13 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		}
 
 		int target = -1;
+
 		int currentWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
 		if(IsValidEntity(currentWeapon) && IsSapperWeapon(currentWeapon)
 		&& IsValidClient((target = GetClientInSapperRange(client))))
 		{
 			bool cloaked = TF2_IsPlayerInCondition(client, TFCond_Cloaked) ? true : GetEntProp(client, Prop_Send, "m_bFeignDeathReady") ? true : false;
+
 			if(buttons & IN_ATTACK && !cloaked
 			&& !TF2_IsPlayerInCondition(client, TFCond_Dazed))
 			{
