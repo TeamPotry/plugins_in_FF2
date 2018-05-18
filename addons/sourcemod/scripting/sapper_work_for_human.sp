@@ -138,23 +138,27 @@ CustomCTFSapper CreateSapper(int client, int target, float lifeTime = 4.0, int f
 	sapper.Flags = flags;
 	sapper.LifeTime = lifeTime;
 
-	SDKHook(target, SDKHook_OnTakeDamage, SapperDamageCheck);
+	// SDKHook(target, SDKHook_OnTakeDamage, SapperDamageCheck);
 
 	return sapper;
 }
 
+/*
 public Action SapperDamageCheck(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	if(IsValidClient(attacker) && IsValidEntity(weapon))
+	if(IsValidClient(attacker) && IsValidEntity(weapon)) // NOTE: NOT WORKING
 	{
 		if(GetClientTeam(victim) == GetClientTeam(attacker) && !(c_hClientSapper[victim].Flags & SAPPER_FLAG_INVULNERABLE))
 		{
 			Address address = TF2Attrib_GetByName(weapon, "damage applies to sappers");
 			if(address != Address_Null && TF2Attrib_GetValue(address) > 0.0)
 			{
-				c_hClientSapper[victim].HP = c_hClientSapper[victim].HP - RoundFloat(damage);
+				c_hClientSapper[victim].HP -= RoundFloat(damage);
+
 				if(c_hClientSapper[victim].HP <= 0)
 				{
+					TF2_RemoveCondition(victim, TFCond_Dazed);
+					TF2_RemoveCondition(victim, TFCond_Sapped);
 					c_hClientSapper[victim].KillSapper();
 				}
 			}
@@ -168,6 +172,7 @@ public Action SapperDamageCheck(int victim, int &attacker, int &inflictor, float
 
 	return Plugin_Continue;
 }
+*/
 
 void OnSapperEnd(CustomCTFSapper sapper)
 {
