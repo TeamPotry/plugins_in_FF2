@@ -3,6 +3,7 @@
 #include <tf2_stocks>
 #include <sdkhooks>
 #include <tf2attributes>
+#include <tutorial_text>
 
 #include <sappper_work_for_human>
 
@@ -17,6 +18,7 @@ public Plugin myinfo=
 CustomCTFSapper c_hClientSapper[MAXPLAYERS+1] = null;
 
 #define SAPPER_FLAG_INVULNERABLE (1<<0)
+#define HINTTEXT_CONFIG_NAME "sapper_work_for_human.cfg"
 
 public void OnMapStart()
 {
@@ -59,6 +61,23 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	if(IsValidClient(client) && IsPlayerAlive(client))
 	{
+		if(IsValidEntity(newWeapon) && IsSapperWeapon(newWeapon))
+		{
+			TTextEvent event = new TTextEvent();
+			ArrayList arrays = new ArrayList();
+			float pos[3];
+			GetClientEyePosition(client, pos);
+			arrays.PushString("4.0"); // TODO: Format
+
+			TT_LoadMessageID(event, HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it");
+
+			// event.FollowEntity = newWeapon;
+			event.SetPosition(pos);
+			event.ChangeTextLanguage(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client, arrays);
+			event.FireTutorialText(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client);
+			delete arrays;
+		}
+
 		int target = -1;
 		int currentWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
 		if(IsValidEntity(currentWeapon) && IsSapperWeapon(currentWeapon)
