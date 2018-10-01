@@ -87,7 +87,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			bool cloaked = TF2_IsPlayerInCondition(client, TFCond_Cloaked) ? true : GetEntProp(client, Prop_Send, "m_bFeignDeathReady") ? true : false;
 
 			if(buttons & IN_ATTACK && !cloaked
-			&& !TF2_IsPlayerInCondition(client, TFCond_Dazed))
+			&& !TF2_IsPlayerInCondition(client, TFCond_Dazed)
+			&& TF2_GetClientTeam(target) != TF2_GetClientTeam(client))
 			{
 				TF2_RemoveWeaponSlot(client, 1);
 				SwitchToOtherWeapon(client);
