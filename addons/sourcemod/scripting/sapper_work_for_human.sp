@@ -63,19 +63,15 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	{
 		if(IsValidEntity(newWeapon) && IsSapperWeapon(newWeapon))
 		{
-			TTextEvent event = new TTextEvent();
-			ArrayList arrays = new ArrayList();
+			TTextEvent event = TTextEvent.InitTTextEvent();
 			float pos[3];
 			GetClientEyePosition(client, pos);
-			arrays.PushString("4.0"); // TODO: Format
 
 			TT_LoadMessageID(event, HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it");
 
-			// event.FollowEntity = newWeapon;
 			event.SetPosition(pos);
-			event.ChangeTextLanguage(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client, arrays);
+			event.ChangeTextLanguage(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client, 4.0);
 			event.FireTutorialText(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client);
-			delete arrays;
 		}
 
 		int target = -1;
