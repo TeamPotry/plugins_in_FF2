@@ -103,14 +103,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 				{
 					char strClass[64];
 					GetEntityClassname(iAim, strClass, sizeof(strClass));
-					if(StrEqual(strClass, "obj_dispenser") && IsBuilder(iAim, client))
+					if(StrEqual(strClass, "obj_dispenser") && IsBuilder(iAim, client) && GetEntPropFloat(iAim, Prop_Send, "m_flPercentageConstructed") >= 1.0)
 					{
 						if(buttons & IN_RELOAD)
 							EquipDispenser(client, iAim);
 						else if(!g_bNoticed[client])
 						{
 							g_bNoticed[client] = true;
-							
+
 							TTextEvent event = TTextEvent.InitTTextEvent();
 							float pos[3];
 							GetClientEyePosition(client, pos);
