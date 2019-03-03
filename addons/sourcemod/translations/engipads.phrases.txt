@@ -1,0 +1,98 @@
+﻿"Phrases"
+{
+	"padphrase_announcement1"
+	{
+		"en"		"Engineer Pads {blue}v%s{default} by {unique}Starblaster64{default}."
+		"ko"		"텔레패드 {blue}v%s{default} - {unique}Starblaster64{default}"
+	}
+	"padphrase_announcement2"
+	{
+		"en"		"Type {olive}/pad{default} to enable/disable building Engineer Pads! Type {olive}/pad_help{default} for more info."
+		"ko"		"명령어 {olive}/pad{default}로 엔지니어 텔레패드를 켜거나 끌 수 있습니다! 명령어 {olive}/pad_help{default}에 자세한 설명이 있습니다."
+	}
+	"padphrase_noaccess"
+	{
+		"en"		"You don't have access to build Engineer Pads!"
+		"ko"		"텔레패드를 사용할 권한이 없습니다!"
+	}
+	"padphrase_enabled"
+	{
+		"en"		"Engineer Pads {green}ENABLED{default}!"
+		"ko"		"텔레패드: {green}ON{default}!"
+	}
+	"padphrase_disabled"
+	{
+		"en"		"Engineer Pads {red}DISABLED{default}!"
+		"ko"		"텔레패드: {red}OFF{default}!"
+	}
+	"padphrase_menutitle"
+	{
+		"en"		"Engineer Pads Toggle Menu"
+		"ko"		"텔레패드 메뉴"
+	}
+	"padphrase_menuenable"
+	{
+		"en"		"Enable"
+		"ko"		"ON"
+	}
+	"padphrase_menudisable"
+	{
+		"en"		"Disable"
+		"ko"		"OFF"
+	}
+	"padphrase_infotitle"
+	{
+		"en"		"=== Engineer Pads ==="
+		"ko"		"=== 텔레패드 설명 ==="
+	}
+	"padphrase_infogeneral"
+	{
+		"en"		"Engineer Pads replace any Teleporters you build. They have %i HP and cannot be upgraded."
+		"ko"		"지으시는 텔레포터가 텔레패드로 대체됩니다. %i HP를 가지며 업그레이드를 하실 수 없습니다."
+	}
+	"padphrase_infoboost"
+	{
+		"en"		"Boost Pads: Increases allies movespeed for %.1fs. Cooldown: %.1fs."
+		"ko"		"부스트 패드: 아군의 이동속도를 %.1f초 동안 증가시킵니다. 쿨다운: %.1f초."
+	}
+	"padphrase_infojump"
+	{
+		"en"		"Jump Pads: Launches allies in the direction they're moving. Cooldown: %.1fs."
+		"ko"		"점프 패드: 아군이 움직이는 방향으로 공중에 발사시킵니다. 쿨다운: %.1f"
+	}
+	"padphrase_infoeureka"
+	{
+		"en"		"You cannot use the Eureka Effect to teleport to any Exits if they have been converted to a Pad."
+		"ko"		"텔레패드를 ON 했을 경우, 유레카 효과의 텔레포트 목적지로 설정하실 수 없습니다."
+	}
+	"padphrase_infosniper"
+	{
+		"en"		"You cannot scope in as a Sniper while being launched by a Jump Pad."
+		"ko"		"점프 패드로 인해 발사되었을 때, 스나이퍼 저격총의 조준을 하실 수 없습니다."
+	}
+	"padphrase_infoaiming"
+	{
+		"en"		"You will not be boosted by Boost Pads if you are scoped in/revved up as a Sniper/Heavy."
+		"ko"		"스나이퍼/헤비로 조준을 하거나/풀고 있는 상태에서 부스트 패드의 효과를 받으실 수 없습니다."
+	}
+	"padphrase_infoexit"
+	{
+		"en"		"Exit"
+		"ko"		"나가기"
+	}
+	"padphrase_deploy"
+	{
+		"en"		"Deploying Pad Type: {teamcolor}%t"
+		"ko"		"텔레패드 모드: {teamcolor}%t"
+	}
+	"padphrase_boost"
+	{
+		"en"		"Boost"
+		"ko"		"부스트"
+	}
+	"padphrase_jump"
+	{
+		"en"		"Jump"
+		"ko"		"점프"
+	}
+}

@@ -1,0 +1,15 @@
+"Games"
+{
+	"#default"
+	{
+		"Signatures"
+		{
+			"CWeaponMedigun::AllowedToHealTarget" // "weapon_blocks_healing" and 4th function or debug and set breakpoints
+			{
+				"library"		"server"
+				"windows"		"\x55\x8B\xEC\x53\x8B\xD9\x56\x57\x8B\xB3\xE8"
+				"linux"			"@_ZN14CWeaponMedigun19AllowedToHealTargetEP11CBaseEntity"
+			}
+		}
+	}
+}

@@ -185,10 +185,14 @@ stock void EquipDispenser(int client, int target)
 
 		pPos[0] += 30.0;	//This moves it up/down
 		pPos[1] += 40.0;
-
+/*
 		pAng[0] += 180.0;
 		pAng[1] -= 90.0;
 		pAng[2] += 90.0;
+*/
+		pAng[0] += 180.0;
+		pAng[1] += 90.0;
+		pAng[2] -= 90.0;
 
 		SetEntPropVector(target, Prop_Send, "m_vecOrigin", pPos);
 		SetEntPropVector(target, Prop_Send, "m_angRotation", pAng);
