@@ -1,5 +1,6 @@
 #include <sourcemod>
 #include <sdktools>
+#include <sprites>
 
 #define VMT_PATH "materials/potry/steam_sale/10.vmt"
 #define MODEL_PATH "materials/potry/steam_sale/10.vtf"
@@ -18,12 +19,14 @@ public void OnPluginStart()
 public Action TestCmd(int client, int argc)
 {
     float pos[3];
-    GetClientEyePosition(client, pos);
+    Sprite sprite = Sprite.Init("test", spriteIndex);
 
     pos[2] += 15.0;
+    sprite.SetPos(pos);
+    sprite.Parent = client;
+    sprite.Time = 10.0;
 
-    TE_SetupGlowSprite(pos, spriteIndex, 10.0, 0.1, 255);
-    TE_SendToAll();
+    sprite.Fire();
 }
 /*
 public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3], float angles[3], int& weapon, int& subtype, int& cmdnum, int& tickcount, int& seed, int mouse[2])

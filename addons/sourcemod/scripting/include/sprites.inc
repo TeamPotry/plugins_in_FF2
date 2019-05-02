@@ -16,6 +16,8 @@ enum
     Sprite_Size,
     Sprite_Brightness,
     Sprite_Time,
+    Sprite_Timer,
+    Sprite_Parent,
 
     Sprite_PosX,
     Sprite_PosY,
@@ -48,7 +50,16 @@ methodmap Sprite < ArrayList {
             return this.Get(Sprite_Size);
         }
         public set(float size) {
-            return this.Set(Sprite_Size, size);
+            this.Set(Sprite_Size, size);
+        }
+    }
+
+    property int Parent {
+        public get() {
+            return this.Get(Sprite_Parent);
+        }
+        public set(int entity) {
+            this.Set(Sprite_Parent, entity);
         }
     }
 
@@ -57,7 +68,7 @@ methodmap Sprite < ArrayList {
             return this.Get(Sprite_Brightness);
         }
         public set(int brightness) {
-            return this.Set(Sprite_Brightness, brightness);
+            this.Set(Sprite_Brightness, brightness);
         }
     }
 
@@ -66,7 +77,13 @@ methodmap Sprite < ArrayList {
             return this.Get(Sprite_Time);
         }
         public set(float time) {
-            return this.Set(Sprite_Time, time);
+            this.Set(Sprite_Time, time);
+        }
+    }
+
+    property Handle Timer {
+        public get() {
+            return this.Get(Sprite_Timer);
         }
     }
 
@@ -84,12 +101,39 @@ methodmap Sprite < ArrayList {
          this.Set(Sprite_PosZ, pos[2]);
     }
 
-    public void Fire()
+    public void Fire(bool looping = false)
     {
         // NOTE: Recommend: size = 1.0, brightness = 255
-        float pos[3];
+        float entPos[3], pos[3];
         this.GetPos(pos);
-        TE_SetupGlowSprite(pos, this.ModelIndex, this.Time, this.Size, this.Brightness);
+
+        if(IsValidEntity(this.Parent)) {
+            GetEntPropVector(this.Parent, Prop_Send, "m_vecOrigin", entPos);
+            AddVectors(entPos, pos, pos);
+            TE_SetupGlowSprite(pos, this.ModelIndex, 0.1, this.Size, this.Brightness);
+
+            if(!looping && this.Timer == null) {
+                CreateTimer(0.1, UpdateParentSprite, this, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+            }
+
+        }
+        else {
+            TE_SetupGlowSprite(pos, this.ModelIndex, this.Time, this.Size, this.Brightness);
+        }
+
         TE_SendToAll();
     }
+}
+
+public Action UpdateParentSprite(Handle timer, Sprite sprite)
+{
+    if(sprite.Time <= 0.0) {
+        sprite.Set(Sprite_Timer, view_as<Handle>(null));
+        return Plugin_Stop;
+    }
+
+    sprite.Time -= 0.1;
+    sprite.Fire(true);
+
+    return Plugin_Continue;
 }
