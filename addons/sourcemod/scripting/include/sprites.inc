@@ -9,87 +9,127 @@
     0.12초마다 갱신됩니다.
 */
 
-enum
-{
-    Sprite_Name,
-    Sprite_ModelIndex,
-    Sprite_Size,
-    Sprite_Brightness,
-    Sprite_Time,
-
-    Sprite_PosX,
-    Sprite_PosY,
-    Sprite_PosZ,
-
-    SpriteItem_MaxCount
-};
-
-methodmap Sprite < ArrayList {
-    public static Sprite Init(const char[] name, int modelIndex)
+methodmap Sprite {
+    public static Sprite Init(const char[] model, int parent, float scale, int brightness)
     {
-        Sprite array = view_as<Sprite>(new ArrayList(128, SpriteItem_MaxCount));
+        /*
+            NOTE: Recommend: size = 1.0, brightness = 255
 
-        array.SetString(Sprite_Name, name);
-        array.Set(Sprite_ModelIndex, modelIndex);
+            @model .vmt
+        */
+        int entity = CreateEntityByName("env_sprite_oriented");
+        float pos[3];
 
-        array.Set(Sprite_Timer, view_as<Handle>(null));
+        DispatchKeyValue(entity, "spawnflags", "1");
+        DispatchKeyValue(entity, "classname", "env_sprite_oriented");
+        DispatchKeyValue(entity, "scale", "0.1"); // ?
+        DispatchKeyValue(entity, "model", model);
+        DispatchKeyValue(entity, "rendermode", "1");
+        DispatchKeyValue(entity, "rendercolor", "255 255 255");
+        DispatchKeyValue(entity, "framerate", "5");
+        DispatchKeyValue(entity, "targetname", "sprite_temp");
 
-        return array;
-    }
+        if(IsValidEntity(parent))
+        {
+            SetVariantString("!activator");
+            AcceptEntityInput(entity, "SetParent", parent);
 
-    property int ModelIndex {
-        public get() {
-            return this.Get(Sprite_ModelIndex);
+            GetEntPropVector(parent, Prop_Send, "m_vecOrigin", pos);
+            TeleportEntity(parent, pos, NULL_VECTOR, NULL_VECTOR);
         }
+
+        DispatchSpawn(entity);
+
+        SetVariantFloat(scale);
+        AcceptEntityInput(entity, "SetScale");
+
+        SetEntProp(entity, Prop_Send, "m_nBrightness", brightness);
+
+        return view_as<Sprite>(entity);
     }
 
     property float Size {
         public get() {
-            return this.Get(Sprite_Size);
+            return GetEntPropFloat(view_as<int>(this), Prop_Send, "m_flSpriteScale");
         }
         public set(float size) {
-            return this.Set(Sprite_Size, size);
+            SetVariantFloat(size);
+            AcceptEntityInput(view_as<int>(this), "SetScale");
         }
     }
 
     property int Brightness {
         public get() {
-            return this.Get(Sprite_Brightness);
+            return GetEntProp(view_as<int>(this), Prop_Send, "m_nBrightness");
         }
         public set(int brightness) {
-            return this.Set(Sprite_Brightness, brightness);
-        }
-    }
-
-    property float Time {
-        public get() {
-            return this.Get(Sprite_Time);
-        }
-        public set(float time) {
-            return this.Set(Sprite_Time, time);
+            SetEntProp(view_as<int>(this), Prop_Send, "m_nBrightness", brightness);
         }
     }
 
     public void GetPos(float pos[3])
     {
-        pos[0] = this.Get(Sprite_PosX);
-        pos[1] = this.Get(Sprite_PosY);
-        pos[2] = this.Get(Sprite_PosZ);
+        GetEntPropVector(view_as<int>(this), Prop_Send, "m_vecOrigin", pos);
     }
 
     public void SetPos(const float pos[3])
     {
-         this.Set(Sprite_PosX, pos[0]);
-         this.Set(Sprite_PosY, pos[1]);
-         this.Set(Sprite_PosZ, pos[2]);
+        TeleportEntity(view_as<int>(this), pos, NULL_VECTOR, NULL_VECTOR);
     }
 
-    public void Fire()
+    public void Show()
     {
-        // NOTE: Recommend: size = 1.0, brightness = 255
-        float pos[3];
-        this.GetPos(pos);
-        TE_SetupGlowSprite(pos, this.ModelIndex, this.Time, this.Size, this.Brightness);
-        TE_SendToAll();
+        AcceptEntityInput(view_as<int>(this), "ShowSprite");
+        AcceptEntityInput(view_as<int>(this), "ToggleSprite");
+    }
+
+    public void Hide()
+    {
+        AcceptEntityInput(view_as<int>(this), "HideSprite");
+    }
+
+    public void Kill()
+    {
+        AcceptEntityInput(view_as<int>(this), "Kill");
     }
 }
+/*
+methodmap PlayerSprites < ArrayList {
+    public static PlayerSprites Init(int client, int maxsize)
+    {
+        PlayerSprites array = view_as<PlayerSprites>(new ArrayList(64, maxsize + 1));
+
+        for(int loop = 0; loop < maxsize + 1; loop++)
+        {
+            if(loop == maxsize)
+                array.Set(loop, client);
+            else
+                array.Set(loop, view_as<PlayerSprites>(null));
+        }
+        return array;
+    }
+
+    property int Owner {
+        public get() {
+            return this.Get(this.Length - 1);
+        }
+    }
+
+    public void Start()
+    {
+        this.Set(Sprite_Timer, CreateTimer(0.1, SpriteUpdateTimer, this, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE));
+    }
+
+    // NOTE: MUST USE THIS FUNCTION FOR STOP TIMER BEFORE DELETE THIS.
+    public void Stop()
+    {
+        Handle timer = this.Get(Sprite_Timer);
+        if(timer != null)
+            KillTimer(timer);
+    }
+}
+
+public Action PlayerSpriteUpdateTimer(Handle timer, Sprite sprite) {
+
+}
+*/
