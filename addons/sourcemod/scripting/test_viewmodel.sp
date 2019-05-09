@@ -25,6 +25,7 @@ public Action TestCmd(int client, int argc)
     sprite.SetPos(pos);
     sprite.Parent = client;
     sprite.Time = 10.0;
+    sprite.Size = 0.1;
 
     sprite.Fire();
 }

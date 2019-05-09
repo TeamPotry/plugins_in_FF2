@@ -109,8 +109,8 @@ methodmap Sprite < ArrayList {
 
         if(IsValidEntity(this.Parent)) {
             GetEntPropVector(this.Parent, Prop_Send, "m_vecOrigin", entPos);
-            AddVectors(entPos, pos, pos);
-            TE_SetupGlowSprite(pos, this.ModelIndex, 0.1, this.Size, this.Brightness);
+            AddPosVectors(entPos, pos, pos);
+            TE_SetupGlowSprite(pos, this.ModelIndex, 0.11, this.Size, this.Brightness);
 
             if(!looping && this.Timer == null) {
                 CreateTimer(0.1, UpdateParentSprite, this, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
@@ -136,4 +136,11 @@ public Action UpdateParentSprite(Handle timer, Sprite sprite)
     sprite.Fire(true);
 
     return Plugin_Continue;
+}
+
+public void AddPosVectors(const float pos[3], const float pos2[3], float[] added)
+{
+    for(int loop = 0; loop < 3; loop++) {
+        added[loop] = pos[loop] + pos2[loop];
+    }
 }
