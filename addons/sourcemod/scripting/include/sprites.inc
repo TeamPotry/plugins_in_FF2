@@ -43,6 +43,9 @@ methodmap Sprite < ArrayList {
         public get() {
             return this.Get(Sprite_ModelIndex);
         }
+        public set(int modelIndex) {
+            this.Set(Sprite_ModelIndex, modelIndex);
+        }
     }
 
     property float Size {
