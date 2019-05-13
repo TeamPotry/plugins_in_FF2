@@ -43,6 +43,9 @@ methodmap Sprite < ArrayList {
         public get() {
             return this.Get(Sprite_ModelIndex);
         }
+        public set(int modelIndex) {
+            this.Set(Sprite_ModelIndex, modelIndex);
+        }
     }
 
     property float Size {
@@ -113,7 +116,7 @@ methodmap Sprite < ArrayList {
             TE_SetupGlowSprite(pos, this.ModelIndex, 0.11, this.Size, this.Brightness);
 
             if(!looping && this.Timer == null) {
-                CreateTimer(0.1, UpdateParentSprite, this, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+                this.Set(Sprite_Timer, CreateTimer(0.1, UpdateParentSprite, this, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE));
             }
 
         }
