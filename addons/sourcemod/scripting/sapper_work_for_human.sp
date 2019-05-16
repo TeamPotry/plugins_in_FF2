@@ -89,8 +89,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 				TF2_RemoveWeaponSlot(client, 1);
 				SwitchToOtherWeapon(client);
 				c_hClientSapper[target] = CreateSapper(client, target);
-				TF2_StunPlayer(target, 4.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
-				TF2_AddCondition(target, TFCond_Sapped, 4.0, client);
+				TF2_StunPlayer(target, 2.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
+				TF2_AddCondition(target, TFCond_Sapped, 2.0, client);
 			}
 		}
 	}
