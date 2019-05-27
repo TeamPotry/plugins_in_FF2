@@ -70,7 +70,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			TT_LoadMessageID(event, HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it");
 
 			event.SetPosition(pos);
-			event.ChangeTextLanguage(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client, 4.0);
+			event.ChangeTextLanguage(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client, 1.5);
 			event.FireTutorialText(HINTTEXT_CONFIG_NAME, "sapper_you_can_do_it", client);
 		}
 
@@ -89,7 +89,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 				TF2_RemoveWeaponSlot(client, 1);
 				SwitchToOtherWeapon(client);
 				c_hClientSapper[target] = CreateSapper(client, target);
-				TF2_StunPlayer(target, 2.0, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
+				TF2_StunPlayer(target, 1.5, 1.0, TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_NOSOUNDOREFFECT, client);
 				TF2_AddCondition(target, TFCond_Sapped, 2.0, client);
 			}
 		}
