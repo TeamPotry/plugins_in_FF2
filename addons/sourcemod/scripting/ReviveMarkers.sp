@@ -668,7 +668,7 @@ public bool:spawnReviveMarker(client)
 		SetEntProp(reviveMarker, Prop_Send, "m_iTeamNum", clientTeam); // client team
 		SetEntProp(reviveMarker, Prop_Send, "m_CollisionGroup", 1);
 		SetEntProp(reviveMarker, Prop_Send, "m_bSimulatedEveryTick", 1);
-		SetEntProp(reviveMarker, Prop_Send, "m_iMaxHealth", 1200);
+		SetEntProp(reviveMarker, Prop_Send, "m_iMaxHealth", 1000);
 		SetEntDataEnt2(client, FindSendPropInfo("CTFPlayer", "m_nForcedSkin")+4, reviveMarker);
 		SetEntProp(reviveMarker, Prop_Send, "m_nBody", _:TF2_GetPlayerClass(client) - 1); // character hologram that is shown
 		SetEntProp(reviveMarker, Prop_Send, "m_nSequence", 1);
