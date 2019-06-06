@@ -18,7 +18,7 @@
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
 #include <freak_fortress_2>
-#include <updater>
+// #include <updater>
 
 /* Plugin constants definiton
  * Category: Preprocessor
@@ -185,7 +185,7 @@ public OnPluginStart() {
 		OnAdminMenuReady(topmenu);
 	}
 	ff2installed = LibraryExists("freak_fortress_2");
-	if (LibraryExists("updater")) { Updater_AddPlugin(PLUGIN_UPDATE_FILE); }
+	// if (LibraryExists("updater")) { Updater_AddPlugin(PLUGIN_UPDATE_FILE); }
 
 	// set optOut, class and team variables
 	decl String:steamid[256], String:OptState[256], String:OptAdmin[256];
@@ -296,9 +296,9 @@ public OnLibraryRemoved(const String:name[]) {
 public OnLibraryAdded(const String:name[]) {
 	if (StrEqual(name, "freak_fortress_2")) {
 		ff2installed = true;
-	} else if (StrEqual(name, "updater")) {
+	} /*else if (StrEqual(name, "updater")) {
 		Updater_AddPlugin(PLUGIN_UPDATE_FILE);
-	}
+	}*/
 }
 
 /* AdminMenu ready for hook
