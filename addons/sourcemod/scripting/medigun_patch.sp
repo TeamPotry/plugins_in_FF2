@@ -7,11 +7,15 @@
 #include <tf2_stocks>
 #include <dhooks>
 
+#include <medigun_patch>
+
 #pragma newdecls required
 
 #define PLUGIN_NAME     "Example all-heal plugin"
 #define PLUGIN_AUTHOR   "Naydef"
 #define PLUGIN_VERSION  "1.0"
+
+Handle OnHeal;
 
 public Plugin myinfo =
 {
@@ -50,6 +54,8 @@ public void OnPluginStart()
     {
         SetFailState("Failed to detour CWeaponMedigun::AllowedToHealTarget!");
     }
+
+    OnHeal = CreateGlobalForward("TF2_OnHealTarget", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef);
 }
 
 public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Handle hParams)
@@ -58,12 +64,12 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
     {
         return MRES_Ignored;
     }
-    int targettoheal=DHookGetParam(hParams, 1);
+    int owner = GetEntPropEnt(pThis, Prop_Send, "m_hOwnerEntity"), targettoheal=DHookGetParam(hParams, 1);
+
     if(IsValidClient(targettoheal) && IsPlayerAlive(targettoheal))
     {
         float pos[3];
         GetClientEyePosition(targettoheal, pos);
-        int owner = GetEntPropEnt(pThis, Prop_Send, "m_hOwnerEntity");
 
         if(IsValidClient(owner) && TF2_GetClientTeam(owner) != TF2_GetClientTeam(targettoheal) && GetEntProp(pThis, Prop_Send, "m_bChargeRelease") <= 0)
         {
@@ -73,6 +79,7 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
             return MRES_ChangedOverride;
         }
     }
+    /*
     else if(IsValidEntity(targettoheal) && targettoheal>MaxClients)
     {
         if(HasEntProp(targettoheal, Prop_Send, "m_iHealth"))
@@ -80,6 +87,21 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
             int health=GetEntProp(targettoheal, Prop_Send, "m_iHealth");
             SetEntProp(targettoheal, Prop_Send, "m_iHealth", health+5);
         }
+    }
+    */
+    bool result = false, tempResult = result;
+    Action action;
+
+    Call_StartForward(OnHeal);
+    Call_PushCell(owner);
+    Call_PushCell(targettoheal);
+    Call_PushCellRef(result);
+    Call_Finish(action);
+
+    if(action == Plugin_Changed)
+    {
+        result = tempResult;
+        return MRES_ChangedOverride;
     }
 
     return MRES_Ignored;
