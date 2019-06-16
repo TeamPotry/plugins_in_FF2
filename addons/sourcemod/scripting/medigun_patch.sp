@@ -65,6 +65,21 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
         return MRES_Ignored;
     }
     int owner = GetEntPropEnt(pThis, Prop_Send, "m_hOwnerEntity"), targettoheal=DHookGetParam(hParams, 1);
+    bool result = false, tempResult = result;
+    Action action;
+
+    Call_StartForward(OnHeal);
+    Call_PushCell(owner);
+    Call_PushCell(targettoheal);
+    Call_PushCellRef(tempResult);
+    Call_Finish(action);
+
+    if(action == Plugin_Changed)
+    {
+        result = tempResult;
+        DHookSetReturn(hReturn, result);
+        return MRES_ChangedOverride;
+    }
 
     if(IsValidClient(targettoheal) && IsPlayerAlive(targettoheal))
     {
@@ -89,20 +104,6 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
         }
     }
     */
-    bool result = false, tempResult = result;
-    Action action;
-
-    Call_StartForward(OnHeal);
-    Call_PushCell(owner);
-    Call_PushCell(targettoheal);
-    Call_PushCellRef(result);
-    Call_Finish(action);
-
-    if(action == Plugin_Changed)
-    {
-        result = tempResult;
-        return MRES_ChangedOverride;
-    }
 
     return MRES_Ignored;
 }
