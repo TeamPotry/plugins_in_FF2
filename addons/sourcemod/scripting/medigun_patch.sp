@@ -68,7 +68,7 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
     bool result = false, tempResult = result;
     Action action;
 
-    if(!IsValidEntity(targettoheal)) return MRES_Ignored;
+    if(!IsValidEntity(targettoheal) || targettoheal == 0) return MRES_Ignored;
 
     Call_StartForward(OnHeal);
     Call_PushCell(owner);
