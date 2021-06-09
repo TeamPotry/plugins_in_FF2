@@ -87,7 +87,7 @@ public OnPluginStart()
 	HookConVarChange(cvar = CreateConVar("sm_saysounds_admin_limit","0","Maximum sounds per saysounds_admin (0 for unlimited)", _, true, 0.0, false, 0.0), Cvar_AdminLimitChanged);
 	g_saysound_limit[2] = GetConVarInt(cvar);
 
-	HookConVarChange(cvar = CreateConVar("sm_saysounds_sound_delay","5.0","Time between each sound trigger, 0.0 to disable checking", _, true, 0.0, false, 0.0), Cvar_DelayChanged);
+	HookConVarChange(cvar = CreateConVar("sm_saysounds_sound_delay","90.0","Time between each sound trigger, 0.0 to disable checking", _, true, 0.0, false, 0.0), Cvar_DelayChanged);
 	gf_saysound_delay[0] = GetConVarFloat(cvar);
 
 	HookConVarChange(cvar = CreateConVar("sm_saysounds_donor_delay","3.0","User flags to bypass the Time between sounds check", _, true, 0.0, false, 0.0), Cvar_DonorDelayChanged);

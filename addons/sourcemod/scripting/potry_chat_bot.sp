@@ -1,3 +1,5 @@
+#pragma newdecls required
+
 #include <sourcemod> //////////
 #include <discord>
 #include <morecolors>
@@ -89,15 +91,12 @@ void CheckConfigFile()
 
 public void OnAllPluginsLoaded()
 {
+    ResetWebHook();
+
     if(gBot == INVALID_HANDLE)
     {
         gBot = new DiscordBot(BOT_TOKEN);
         gBot.MessageCheckInterval = 0.2;
-    }
-    if(gChatWebhook == INVALID_HANDLE)
-    {
-        gChatWebhook = new DiscordWebHook(CHAT_WEBHOOK_URL);
-        gChatWebhook.SlackMode = true;
     }
     if(gSuggestionWebhook == INVALID_HANDLE)
     {
@@ -123,6 +122,7 @@ public void OnMapStart()
         GetCurrentMap(map, sizeof(map));
         Format(discordMessage, sizeof(discordMessage), "현재 맵: %s", map);
 
+        ResetWebHook();
         gChatWebhook.SetUsername("POTRY - Chat");
 
         MessageEmbed Embed = new MessageEmbed();
@@ -134,8 +134,6 @@ public void OnMapStart()
 
     	gChatWebhook.Embed(Embed);
     	gChatWebhook.Send();
-
-
     }
 
     if(gSuggestionWebhook != INVALID_HANDLE)
@@ -161,7 +159,7 @@ public void OnMapStart()
 
 public void OnClientPostAdminCheck(int client)
 {
-    if(gChatWebhook != INVALID_HANDLE && !IsFakeClient(client))
+    if(!IsFakeClient(client))
     {
         char steamAccount[32], steamAccount2[32], steamProfileUrl[150], playerName[64], accountText[80];
         GetClientName(client, playerName, sizeof(playerName));
@@ -185,6 +183,7 @@ public void OnClientPostAdminCheck(int client)
     	Embed.AddField("서버에 입장하셨습니다.", "", true);
         Embed.AddField("Steam ID:", accountText, false);
 
+        ResetWebHook();
     	gChatWebhook.Embed(Embed);
     	gChatWebhook.Send();
     }
@@ -215,6 +214,7 @@ public void OnClientDisconnect(int client)
     	Embed.AddField("서버에서 퇴장하셨습니다.", "", true);
         Embed.AddField("Steam ID:", accountText, false);
 
+        ResetWebHook();
     	gChatWebhook.Embed(Embed);
     	gChatWebhook.Send();
 
@@ -263,11 +263,12 @@ public void OnMessage(DiscordBot Bot, DiscordChannel Channel, DiscordMessage mes
 
     char messageString[120];
     char userName[60];
-    char id[80];
+    char id[80], userId[80];
     message.GetContent(messageString, sizeof(messageString));
     Channel.GetID(id, sizeof(id));
 
     DiscordUser user = message.GetAuthor();
+    user.GetID(userId, sizeof(userId));
     user.GetUsername(userName, sizeof(userName));
 	// PrintToServer("Message from discord: %s", messageString);
 
@@ -441,6 +442,7 @@ public Action Listener_Say(int client, const char[] command, int argc)
     	Embed.AddField(chat[1], "", false);
         Embed.AddField("Steam ID:", accountText, false);
 
+        ResetWebHook();
     	gChatWebhook.Embed(Embed);
     	gChatWebhook.Send();
     }
@@ -531,6 +533,15 @@ public void SendHTTPRequest(char steamcid[32], int client)
 
     // Send the request to the front of the queue
     SteamWorks_PrioritizeHTTPRequest(HTTPRequest);
+}
+
+void ResetWebHook()
+{
+    if(gChatWebhook != null)
+        delete gChatWebhook;
+
+    gChatWebhook = new DiscordWebHook(CHAT_WEBHOOK_URL);
+    gChatWebhook.SlackMode = true;
 }
 
 /*

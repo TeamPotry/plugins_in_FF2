@@ -2,7 +2,6 @@
 #include <sdkhooks>
 #include <tf2>
 #include <tf2_stocks>
-#include <tutorial_text>
 
 #pragma newdecls required
 
@@ -13,8 +12,6 @@ int g_CarriedDispenser[MAXPLAYERS+1];
 bool g_bNoticed[MAXPLAYERS+1];
 
 Handle g_hSDKMakeCarriedObject;
-
-#define HINTTEXT_CONFIG_NAME "backpackdispenser.cfg"
 
 public Plugin myinfo =
 {
@@ -110,16 +107,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 						else if(!g_bNoticed[client])
 						{
 							g_bNoticed[client] = true;
-
-							TTextEvent event = TTextEvent.InitTTextEvent();
-							float pos[3];
-							GetClientEyePosition(client, pos);
-
-							TT_LoadMessageID(event, HINTTEXT_CONFIG_NAME, "dispenser_you_can_do_it");
-
-							event.SetPosition(pos);
-							event.ChangeTextLanguage(HINTTEXT_CONFIG_NAME, "dispenser_you_can_do_it", client);
-							event.FireTutorialText(HINTTEXT_CONFIG_NAME, "dispenser_you_can_do_it", client);
 						}
 					}
 				}
