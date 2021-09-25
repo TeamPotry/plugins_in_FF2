@@ -855,7 +855,7 @@ public ReloadMyself() {
  *
 */
 public bool:VSHEnabled() {
-	 if (ff2installed) {
+	if (ff2installed) {
 		if (FF2_IsFF2Enabled()) {
 			if (FF2_GetBossUserId() != -1) {
 				return true;

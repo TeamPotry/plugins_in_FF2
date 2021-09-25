@@ -10,6 +10,11 @@
 				"windows"		"\x55\x8B\xEC\x53\x8B\xD9\x56\x57\x8B\xB3\xE8"
 				"linux"			"@_ZN14CWeaponMedigun19AllowedToHealTargetEP11CBaseEntity"
 			}
+			"CTFPlayerShared::CanRecieveMedigunChargeEffect"
+			{
+				"linux"		"@_ZNK15CTFPlayerShared29CanRecieveMedigunChargeEffectE20medigun_charge_types"
+				"windows"	"\x55\x8B\xEC\x53\x56\x57\x8B\xF9\xB3\x01"
+			}
 		}
 	}
 }

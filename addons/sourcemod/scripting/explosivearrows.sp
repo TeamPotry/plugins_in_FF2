@@ -223,6 +223,8 @@ public Action:OnEntityTouch(entity, other) {
 		return Plugin_Continue;
 	if(!g_Arrows[client])
 		return Plugin_Continue;
+	if(IsValidClient(other) && GetClientTeam(client) == GetClientTeam(other))
+		return Plugin_Continue;
 	if(FF2_GetBossIndex(client) != -1)
 		return Plugin_Continue;
 

@@ -1,0 +1,55 @@
+"Games"
+{
+	/* Team Fortress 2 */
+	"tf"
+	{
+		"Signatures"
+		{
+			"CBaseObject::AttachObjectToObject"
+			{
+				"linux"		"@_ZN11CBaseObject20AttachObjectToObjectEP11CBaseEntityiR6Vector"
+				"windows"	" "
+			}
+			"CBaseAnimating::LookupAttachment"
+			{
+				"linux"		"@_ZN14CBaseAnimating16LookupAttachmentEPKc"
+				"windows"	" "
+			}
+			"CBaseEntity::SetParent"
+			{
+				"linux"		"@_ZN11CBaseEntity9SetParentEPS_i"
+				"windows"	" "
+			}
+			"CTFPlayer::CanPickupBuilding"
+			{
+				"linux"		"@_ZN9CTFPlayer17CanPickupBuildingEP11CBaseObject"
+				"windows"	" "
+			}
+		}
+		"Offsets"
+		{
+			"CBaseObject::MakeCarriedObject"	//CBaseObject::MakeCarriedObject(CTFPlayer *)
+			{
+				"windows"	"381"
+				"linux"		"383"
+			}
+		}
+		"Functions"
+		{
+			"CTFPlayer::CanPickupBuilding"
+			{
+				"signature"	"CTFPlayer::CanPickupBuilding"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"entity"
+				"arguments"
+				{
+					"pPickupObject"
+					{
+						"type"	"cbaseentity"
+					}
+				}
+			}
+		}
+	}
+}

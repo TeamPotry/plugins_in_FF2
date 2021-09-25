@@ -604,7 +604,6 @@ public Action:AttemptSaySound(client, String:sound[])
 				return Plugin_Continue;
 			}
 		}
-
 		if(adminonly)
 		{
 			if(client && IsClientInGame(client))
@@ -612,6 +611,10 @@ public Action:AttemptSaySound(client, String:sound[])
 				PrintToChat(client, "[SM] you do not have access to this sound");
 			}
 		}
+	}
+	else
+	{
+		CPrintToChat(client, "[SM] %.1f초 후에 세이사운드를 사용할 수 있습니다.", gf_LastSaysound[client] - time);
 	}
 
 	return Plugin_Continue;
