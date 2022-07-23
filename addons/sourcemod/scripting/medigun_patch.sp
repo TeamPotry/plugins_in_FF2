@@ -7,14 +7,14 @@
 #include <tf2_stocks>
 #include <tf2utils>
 #include <dhooks>
-
+#include <tf2attributes>
 #include <medigun_patch>
 
 #pragma newdecls required
 
-#define PLUGIN_NAME     "Example all-heal plugin"
-#define PLUGIN_AUTHOR   "Naydef"
-#define PLUGIN_VERSION  "1.0"
+#define PLUGIN_NAME     "Medigun Patch"
+#define PLUGIN_AUTHOR   "Nopied"
+#define PLUGIN_VERSION  "20220723"
 
 Handle OnHeal;
 
@@ -25,60 +25,50 @@ public Plugin myinfo =
     version = PLUGIN_VERSION,
 };
 
-Handle hDetourAllowedToHealTarget;
-Handle hDetourCanRecieveMedigunChargeEffect;
+float g_flLastDamgeTime[MAXPLAYERS+1];
 
 public void OnPluginStart()
 {
-    Handle gamedatafile=LoadGameConfigFile("ghostbuster_defs.games");
-    if(gamedatafile==null)
-    {
+    HookEvent("teamplay_round_start", OnRoundStart);
+
+    GameData gamedatafile = LoadGameConfigFile("ghostbuster_defs.games");
+    if(gamedatafile == null)
         SetFailState("Cannot find file ghostbuster_defs.games!");
-    }
-    hDetourAllowedToHealTarget=DHookCreateDetour(Address_Null, CallConv_THISCALL, ReturnType_Bool, ThisPointer_CBaseEntity);
-    if(hDetourAllowedToHealTarget==null)
-    {
-        SetFailState("Failed to create CWeaponMedigun::AllowedToHealTarget detour!");
-    }
-    hDetourCanRecieveMedigunChargeEffect=DHookCreateDetour(Address_Null, CallConv_THISCALL, ReturnType_Bool, ThisPointer_CBaseEntity);
-    if(hDetourCanRecieveMedigunChargeEffect==null)
-    {
-        SetFailState("Failed to create CTFPlayerShared::CanRecieveMedigunChargeEffect detour!");
-    }
-    // Load the address of the function from PTaH's signature gamedata file.
-    if(!DHookSetFromConf(hDetourAllowedToHealTarget, gamedatafile, SDKConf_Signature, "CWeaponMedigun::AllowedToHealTarget"))
-    {
-        SetFailState("Failed to load CWeaponMedigun::AllowedToHealTarget signature from gamedata");
-    }
-    if(!DHookSetFromConf(hDetourCanRecieveMedigunChargeEffect, gamedatafile, SDKConf_Signature, "CTFPlayerShared::CanRecieveMedigunChargeEffect"))
-    {
-        SetFailState("Failed to load CTFPlayerShared::CanRecieveMedigunChargeEffect signature from gamedata");
-    }
-    // Load the address of the function from PTaH's signature gamedata file.
+
+    CreateDynamicDetour(gamedatafile, "CWeaponMedigun::AllowedToHealTarget", _, Detour_AllowedToHealTargetPost);
+    // CreateDynamicDetour(gamedatafile, "CWeaponMedigun::HealTargetThink", DHookCallback_Medigun_HealTargetThink_Pre, DHookCallback_Medigun_HealTargetThink_Post);
     delete gamedatafile;
-
-    //CWeaponMedigun::AllowedToHealTarget
-    DHookAddParam(hDetourAllowedToHealTarget, HookParamType_CBaseEntity);
-    //CTFPlayerShared::CanRecieveMedigunChargeEffect
-    DHookAddParam(hDetourCanRecieveMedigunChargeEffect, HookParamType_CBaseEntity);
-
-    // Add a post hook on the function.
-    if(!DHookEnableDetour(hDetourAllowedToHealTarget, false, Detour_AllowedToHealTargetPost))
-    {
-        SetFailState("Failed to detour CWeaponMedigun::AllowedToHealTarget!");
-    }
-    if(!DHookEnableDetour(hDetourCanRecieveMedigunChargeEffect, false, Detour_CanRecieveMedigunChargeEffectPre))
-    {
-        SetFailState("Failed to detour CTFPlayerShared::CanRecieveMedigunChargeEffect!");
-    }
 
     OnHeal = CreateGlobalForward("TF2_OnHealTarget", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef);
 }
 
-public MRESReturn Detour_CanRecieveMedigunChargeEffectPre(int pThis, Handle hReturn, Handle hParams)
+public Action OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
-    return MRES_Ignored;
+    for(int client = 1; client <= MaxClients; client++)
+    {
+        g_flLastDamgeTime[client] = 0.0;
+    }
 }
+
+static void CreateDynamicDetour(GameData gamedata, const char[] name, DHookCallback callbackPre = INVALID_FUNCTION, DHookCallback callbackPost = INVALID_FUNCTION)
+{
+	DynamicDetour detour = DynamicDetour.FromConf(gamedata, name);
+	if (detour)
+	{
+		if (callbackPre != INVALID_FUNCTION)
+			detour.Enable(Hook_Pre, callbackPre);
+
+		if (callbackPost != INVALID_FUNCTION)
+			detour.Enable(Hook_Post, callbackPost);
+	}
+	else
+	{
+		LogError("Failed to create detour setup handle for %s", name);
+	}
+}
+
+// bool g_bBlockHealing = false;
+// int g_iCurrentHealth, g_iHealingTarget;
 
 public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Handle hParams)
 {
@@ -113,27 +103,76 @@ public MRESReturn Detour_AllowedToHealTargetPost(int pThis, Handle hReturn, Hand
         if(IsValidClient(owner) && TF2_GetClientTeam(owner) != TF2_GetClientTeam(targettoheal)
         && GetEntPropFloat(pThis, Prop_Send, "m_flChargeLevel") < 1.0 && GetEntProp(pThis, Prop_Send, "m_bChargeRelease") == 0)
         {
-            if(!(TF2_IsPlayerInCondition(targettoheal, TFCond_Ubercharged) || TF2_IsPlayerInCondition(targettoheal, TFCond_UberchargedHidden)))
+            if(!(TF2_IsPlayerInCondition(targettoheal, TFCond_Ubercharged) || TF2_IsPlayerInCondition(targettoheal, TFCond_UberchargedHidden))
+              && g_flLastDamgeTime[owner] < GetGameTime())
+            {
+                g_flLastDamgeTime[owner] = GetGameTime() + 0.15;
+                // 30 per second (6.0 per 0.2 second)
                 SDKHooks_TakeDamage(targettoheal, owner, owner, 6.0, DMG_SHOCK|DMG_PREVENT_PHYSICS_FORCE, pThis, pos, pos);
+
+                // disable heal a while heal player on other team.
+                TF2Attrib_AddCustomPlayerAttribute(owner, "heal rate penalty", 0.0, 0.25);
+            }
 
             DHookSetReturn(hReturn, true);
             return MRES_ChangedOverride;
         }
     }
-    /*
     else if(IsValidEntity(targettoheal) && targettoheal>MaxClients)
     {
-        if(HasEntProp(targettoheal, Prop_Send, "m_iHealth"))
+        char classname[64];
+        GetEntityClassname(targettoheal, classname, sizeof(classname));
+
+        float pos[3];
+        GetEntPropVector(targettoheal, Prop_Data, "m_vecOrigin", pos);
+
+        if(!StrEqual(classname, "obj_dispenser") && !StrEqual(classname, "obj_sentrygun")
+            && !StrEqual(classname, "obj_teleporter"))
+                return MRES_Ignored;
+
+        if(GetClientTeam(owner) != GetEntProp(targettoheal, Prop_Send, "m_iTeamNum")
+            && g_flLastDamgeTime[owner] < GetGameTime())
         {
-            int health=GetEntProp(targettoheal, Prop_Send, "m_iHealth");
-            SetEntProp(targettoheal, Prop_Send, "m_iHealth", health+5);
+            g_flLastDamgeTime[owner] = GetGameTime() + 0.15;
+            // 30 per second (6.0 per 0.2 second)
+            SDKHooks_TakeDamage(targettoheal, owner, owner, 6.0, DMG_SHOCK|DMG_PREVENT_PHYSICS_FORCE, pThis, pos, pos);
+
+            // disable heal a while heal player on other team.
+            TF2Attrib_AddCustomPlayerAttribute(owner, "heal rate penalty", 0.0, 0.25);
+            // g_bBlockHealing = true;
+            // g_iHealingTarget = targettoheal;
         }
+
+        DHookSetReturn(hReturn, true);
+        return MRES_ChangedOverride;
     }
-    */
+
+    return MRES_Ignored;
+}
+/*
+public MRESReturn DHookCallback_Medigun_HealTargetThink_Pre(int pThis)
+{
+    if(pThis==-1)			return MRES_Ignored;
+
+    if(g_bBlockHealing)
+        g_iCurrentHealth = GetEntProp(g_iHealingTarget, Prop_Data, "m_iHealth");
 
     return MRES_Ignored;
 }
 
+public MRESReturn DHookCallback_Medigun_HealTargetThink_Post(int pThis)
+{
+    bool blockThis = g_bBlockHealing;
+    g_bBlockHealing = false;
+
+    if(pThis==-1)			return MRES_Ignored;
+
+    if(blockThis)
+        SetEntProp(g_iHealingTarget, Prop_Data, "m_iHealth", g_iCurrentHealth);
+
+    return MRES_Ignored;
+}
+*/
 stock bool IsValidClient(int client)
 {
     return (0 < client && client <= MaxClients && IsClientInGame(client));

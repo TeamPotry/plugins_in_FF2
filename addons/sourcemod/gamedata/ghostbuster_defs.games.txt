@@ -15,6 +15,36 @@
 				"linux"		"@_ZNK15CTFPlayerShared29CanRecieveMedigunChargeEffectE20medigun_charge_types"
 				"windows"	"\x55\x8B\xEC\x53\x56\x57\x8B\xF9\xB3\x01"
 			}
+			"CWeaponMedigun::HealTargetThink"
+			{
+				"linux"		"@_ZN14CWeaponMedigun15HealTargetThinkEv"
+				"windows"	" "
+			}
+		}
+		"Functions"
+		{
+			"CWeaponMedigun::AllowedToHealTarget"
+			{
+				"signature" "CWeaponMedigun::AllowedToHealTarget"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"entity"
+
+				"arguments"
+				{
+					"pPlayer"
+					{
+						"type"	"cbaseentity"
+					}
+				}
+			}
+			"CWeaponMedigun::HealTargetThink"
+			{
+				"signature" "CWeaponMedigun::HealTargetThink"
+				"callconv"	"thiscall"
+				"return"	"void"
+				"this"		"entity"
+			}
 		}
 	}
 }
