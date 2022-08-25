@@ -168,6 +168,8 @@ public void OnPluginStart()
 	HookEvent("player_hurt", PlayerHurt, EventHookMode_Post);
 
 	HookEvent("player_builtobject", ObjectBuilt, EventHookMode_Post);
+	HookEvent("player_dropobject", ObjectBuilt, EventHookMode_Post);
+	
 	HookEvent("player_sapped_object", ObjectSapped, EventHookMode_Post);
 	HookEvent("player_carryobject", ObjectDestroyed, EventHookMode_Post);
 

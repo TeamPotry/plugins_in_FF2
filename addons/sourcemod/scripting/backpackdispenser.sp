@@ -403,7 +403,9 @@ stock bool IsValidBuilding(int iBuilding)
 	{
 		if (GetEntProp(iBuilding, Prop_Send, "m_bPlacing") == 0
 		 && GetEntProp(iBuilding, Prop_Send, "m_bCarried") == 0
-		 && GetEntProp(iBuilding, Prop_Send, "m_bCarryDeploy") == 0)
+		 && GetEntProp(iBuilding, Prop_Send, "m_bCarryDeploy") == 0
+		 && GetEntProp(iBuilding, Prop_Send, "m_bBuilding") == 0 )
+
 			return true;
 	}
 
