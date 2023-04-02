@@ -14,7 +14,7 @@ int g_CarriedDispenser[MAXPLAYERS+1];
 #define	MAX_EDICTS		(1 << MAX_EDICT_BITS)
 bool g_bDispenserBlocked[MAX_EDICTS+1];
 
-Handle g_hSDKMakeCarriedObject;
+Handle g_hSDKCallSentryDeploy;
 Handle g_hSDKAttachObjectToObject;
 Handle g_hSDKLookupAttachment;
 Handle g_hSDKSetParent;
@@ -33,9 +33,8 @@ public void OnPluginStart()
 	GameData hConfig = LoadGameConfigFile("tf2.backpackdispenser");
 
 	StartPrepSDKCall(SDKCall_Entity);
-	PrepSDKCall_SetFromConf(hConfig, SDKConf_Virtual, "CBaseObject::MakeCarriedObject");
-	PrepSDKCall_AddParameter(SDKType_CBasePlayer, SDKPass_Pointer); //Player
-	if ((g_hSDKMakeCarriedObject = EndPrepSDKCall()) == INVALID_HANDLE) SetFailState("Failed To create SDKCall for CBaseObject::MakeCarriedObject offset");
+    PrepSDKCall_SetFromConf(hConfig, SDKConf_Signature, "CTFWeaponBuilder::Deploy");
+	if ((g_hSDKCallSentryDeploy = EndPrepSDKCall()) == INVALID_HANDLE) SetFailState("Failed To create SDKCall for CTFWeaponBuilder::Deploy offset");
 
 	StartPrepSDKCall(SDKCall_Entity);
 	PrepSDKCall_SetFromConf(hConfig, SDKConf_Signature, "CBaseObject::AttachObjectToObject");
@@ -312,32 +311,32 @@ public Action AttachDispenser(Handle timer, DataPack data)
 	return Plugin_Continue;
 }
 */
-stock void UnequipDispenser(int client)
+public void UnequipDispenser(int client)
 {
 	int Dispenser = EntRefToEntIndex(g_CarriedDispenser[client]);
 	if(Dispenser != INVALID_ENT_REFERENCE)
 	{
 		int iBuilder = GetPlayerWeaponSlot(client, view_as<int>(TFWeaponSlot_PDA));
 
-		SDKCall(g_hSDKMakeCarriedObject, Dispenser, client);
-
-		SetEntPropEnt(iBuilder, Prop_Send, "m_hObjectBeingBuilt", Dispenser);
-		SetEntProp(iBuilder, Prop_Send, "m_iBuildState", 2);
-
 		SetEntProp(Dispenser, Prop_Send, "m_bCarried", 1);
 		SetEntProp(Dispenser, Prop_Send, "m_bPlacing", 1);
 		SetEntProp(Dispenser, Prop_Send, "m_bCarryDeploy", 0);
 		SetEntProp(Dispenser, Prop_Send, "m_iDesiredBuildRotations", 0);
 		SetEntProp(Dispenser, Prop_Send, "m_iUpgradeLevel", 1);
-
-		// SetEntProp(Dispenser, Prop_Send, "m_CollisionGroup", 21);
-		SetEntProp(Dispenser, Prop_Send, "m_nSolidType", 0);
-		SetEntProp(Dispenser, Prop_Send, "m_usSolidFlags", 0x0004);
+		
 		g_bDispenserBlocked[Dispenser] = true;
 
 		SetEntityModel(Dispenser, DISPENSER_BLUEPRINT);
 
+		SetEntPropEnt(iBuilder, Prop_Send, "m_hObjectBeingBuilt", Dispenser);
+		SetEntProp(iBuilder, Prop_Send, "m_iBuildState", 2);
 		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iBuilder);
+
+		SDKCall(g_hSDKCallSentryDeploy, iBuilder);
+
+		// SetEntProp(Dispenser, Prop_Send, "m_CollisionGroup", 21);
+		SetEntProp(Dispenser, Prop_Send, "m_nSolidType", 0);
+		SetEntProp(Dispenser, Prop_Send, "m_usSolidFlags", 0x0004);
 		AcceptEntityInput(Dispenser, "ClearParent");
 
 		int iLink = GetEntPropEnt(Dispenser, Prop_Send, "m_hEffectEntity");
