@@ -9,6 +9,8 @@ Handle g_hStudioFrameAdvance;
 Handle g_hAllocateLayer;
 Handle g_hResetSequence;
 
+int g_iBeamModel, g_iHaloModel;
+
 public void OnPluginStart()
 {
     RegAdminCmd("mymodel", Cmd_Test, ADMFLAG_CHEATS);
@@ -26,6 +28,34 @@ public void OnPluginStart()
     {
         SetFailState("Could not find potry gamedata");
     }
+}
+
+public void OnMapStart()
+{
+	PrecacheBeamPoint();
+}
+
+void PrecacheBeamPoint()
+{
+    Handle gameConfig = LoadGameConfigFile("funcommands.games");
+    if (gameConfig == null)
+    {
+        SetFailState("Unable to load game config funcommands.games");
+        return;
+    }
+
+    char buffer[PLATFORM_MAX_PATH];
+    if (GameConfGetKeyValue(gameConfig, "SpriteBeam", buffer, sizeof(buffer)) && buffer[0])
+    {
+        g_iBeamModel = PrecacheModel(buffer);
+    }
+
+    if (GameConfGetKeyValue(gameConfig, "SpriteHalo", buffer, sizeof(buffer)) && buffer[0])
+    {
+        g_iHaloModel = PrecacheModel(buffer);
+    }
+
+    delete gameConfig;
 }
 
 public Action Cmd_Test(int client, int args)
@@ -59,6 +89,84 @@ public Action Cmd_Test(int client, int args)
         LogMessage("[%i]: Animation Name: %s\n ㄴ flags: %d\n ㄴ animindex: %d\n ㄴ fps: %.1f",
             loop, name, animation.flags, animation.animindex, animation.fps);
     }
+
+    ArrayList boneArray = new ArrayList();
+    for(int loop = 0; loop < hdr.numbones; loop++)
+    {  
+        Bone bone = hdr.GetBone(loop);
+
+        bone.GetName(name, sizeof(name));
+
+        float bonePos[3], boneRot[3];
+        bone.get_pos(bonePos);
+        bone.get_rot(boneRot);
+       
+        int parent = bone.parent;
+
+        LogMessage("[%i]: Bone Name: %s (parent: %d)\n ㄴ bonePos: %.1f, %.1f, %.1f\n ㄴ boneRot: %.1f, %.1f, %.1f",
+            loop, name, parent, bonePos[0], bonePos[1], bonePos[2], boneRot[0], boneRot[1], boneRot[2]);
+    
+        ArrayList boneInfo = new ArrayList();
+        boneInfo.Push(parent);
+        boneInfo.Push(bonePos[0]);
+        boneInfo.Push(bonePos[1]);
+        boneInfo.Push(bonePos[2]);
+
+        boneArray.Push(boneInfo);
+    }
+
+    int colors[4] = {255, 60, 60, 255};
+    for(int loop = 0; loop < hdr.numbones; loop++)
+    {
+        float bonePos[3], parentPos[3];
+        ArrayList boneInfo = boneArray.Get(loop); 
+
+        int parent = boneInfo.Get(0);
+        bonePos[0] = boneInfo.Get(1);
+        bonePos[1] = boneInfo.Get(2);
+        bonePos[2] = boneInfo.Get(3);
+
+        if(parent == -1)
+    		GetEntPropVector(client, Prop_Data, "m_vecOrigin", parentPos);
+        else
+        {
+            ArrayList parentInfo = boneArray.Get(parent);
+            parentPos[0] = parentInfo.Get(1);
+            parentPos[1] = parentInfo.Get(2);
+            parentPos[2] = parentInfo.Get(3);
+        }
+
+        AddVectors(parentPos, bonePos, bonePos);
+
+        boneInfo.Set(1, bonePos[0]);
+        boneInfo.Set(2, bonePos[1]);
+        boneInfo.Set(3, bonePos[2]);
+
+        float effectPos[3];
+        effectPos = bonePos;
+        effectPos[2] += -1.0;
+
+        TE_SetupBeamPoints(bonePos, effectPos, g_iBeamModel, g_iHaloModel, 0, 10, 10.0, 2.0, 100.0, 10, 0.0, colors, 100);
+        TE_SendToAll();
+    }
+
+    for(int loop = 0; loop < hdr.numbones; loop++)
+    {
+        ArrayList boneInfo = boneArray.Get(loop);
+        delete boneInfo;
+    }
+    delete boneArray;
+
+
+//  float parentPos[3];    
+//     if(parent != -1)
+//         {
+//             Bone parentBone = hdr.GetBone(parent);
+//             bone.get_pos(parentPos);
+
+//             AddVectors();
+//         }
+//         
 
     for(int loop = 0; loop < hdr.numlocalseq; loop++)
     {

@@ -169,7 +169,7 @@ public void OnPluginStart()
 
 	HookEvent("player_builtobject", ObjectBuilt, EventHookMode_Post);
 	HookEvent("player_dropobject", ObjectBuilt, EventHookMode_Post);
-	
+
 	HookEvent("player_sapped_object", ObjectSapped, EventHookMode_Post);
 	HookEvent("player_carryobject", ObjectDestroyed, EventHookMode_Post);
 
@@ -1282,6 +1282,11 @@ stock int FindEntityByClassname2(int startEnt, char[] classname)
 	/* If startEnt isn't valid shifting it back to the nearest valid one */
 	while (startEnt > -1 && !IsValidEntity(startEnt)) startEnt--;
 	return FindEntityByClassname(startEnt, classname);
+}
+
+public bool IsPad(int ent)
+{
+	return g_iPadType[ent] != PadType_None;
 }
 
 #if !defined _smlib_included

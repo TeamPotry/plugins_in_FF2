@@ -170,7 +170,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		{
 			if((buttons & IN_RELOAD && buttons & IN_ATTACK2) && GetEntProp(client, Prop_Send, "m_bCarryingObject") == 0 && g_CarriedDispenser[client] != INVALID_ENT_REFERENCE)
 			{
-				UnequipDispenser(client);
+				TF2_AddCondition(client, TFCond_HalloweenKartNoTurn, 0.1);
+				RequestFrame(UnequipDispenser, client);
+				// UnequipDispenser(client);
 			}
 		}
 
